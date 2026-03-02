@@ -31,7 +31,7 @@ jobs:
 
       - name: Prepare input
         working-directory: tools/Stateless/Tester
-        run: dotnet run -c release --project Tester.csproj -- ../ZiskGuest/bin
+        run: dotnet run -c release --project Tester.csproj -- ../ZiskGuest/bin/input.bin
 
       - name: Build Nethermind
         working-directory: tools/Stateless
