@@ -29,9 +29,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set up Zisk
-        run: curl -sL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup | bash -s -- --nokey
-
       - name: Prepare input
         working-directory: tools/Stateless/Tester
         run: dotnet run -c release --project Tester.csproj -- ../ZiskGuest/bin
@@ -41,9 +38,10 @@ jobs:
         run: make build-zisk
 
       - name: Test Nethermind
-        working-directory: tools/Stateless/ZiskGuest
+        working-directory: tools/Stateless
         run: |
-          ziskemu -e ./bin/nethermind -i ./bin/input.bin
+          docker build -t zisk .
+          docker run --rm -it zisk ziskemu -e /n/nethermind -i /n/input.bin
 
       - name: Upload guest binary
         if: github.event.inputs.upload == 'true'
