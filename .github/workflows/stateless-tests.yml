@@ -41,7 +41,7 @@ jobs:
         working-directory: tools/Stateless/ZiskGuest
         run: |
           docker build -t zisk .
-          docker run --rm -it zisk ziskemu -e /n/nethermind -i /n/input.bin
+          docker run --rm zisk ziskemu -e /n/nethermind -i /n/input.bin
 
       - name: Upload guest binary
         if: github.event.inputs.upload == 'true'
