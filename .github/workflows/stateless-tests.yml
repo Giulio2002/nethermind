@@ -50,3 +50,34 @@ jobs:
           name: zisk-guest
           path: tools/Stateless/ZiskGuest/bin/nethermind
           if-no-files-found: error
+
+  test-qemu:
+    name: Test on QEMU
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Nethermind
+        working-directory: tools/Stateless
+        run: make build-tester
+
+      - name: Test Nethermind
+        working-directory: tools/Stateless/Tester
+        run: |
+          docker build -t zkevm .
+          docker run --rm zkevm
+
+      - name: Upload guest binary
+        if: github.event.inputs.upload == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zisk-guest
+          path: tools/Stateless/Tester/bin/nethermind
+          if-no-files-found: error
