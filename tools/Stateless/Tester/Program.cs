@@ -32,11 +32,16 @@ class Program
 #else
         // If a command line option is specified, treat it as a location
         // where the input data for the Zisk guest should be written
-        if (args.Length == 1)
+        if (args.Length == 1 && !string.IsNullOrWhiteSpace(args[0]))
         {
             byte[] data = InputSerializer.Serialize(suggestedBlock, witness, (uint)specProvider.ChainId);
 
-            File.WriteAllBytes(Path.Join(args[0], "input.bin"), data);
+            var dir = Path.GetDirectoryName(args[0]);
+
+            if (dir is not null)
+                Directory.CreateDirectory(dir);
+
+            File.WriteAllBytes(args[0], data);
         }
 
         // Otherwise, this is a testing playground
