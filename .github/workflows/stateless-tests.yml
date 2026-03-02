@@ -71,7 +71,7 @@ jobs:
       - name: Test Nethermind
         working-directory: tools/Stateless/Tester
         run: |
-          docker build -t zkevm .
+          docker build --platform linux/amd64 -t zkevm .
           docker run --rm zkevm
 
       - name: Upload guest binary
