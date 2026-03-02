@@ -1,0 +1,54 @@
+name: Test stateless execution
+
+on:
+  merge_group:
+    types: [checks_requested]
+  pull_request:
+    branches: [master]
+  push:
+    branches: [test/stateless-zisk]
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: Upload binaries
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  test-zisk:
+    name: Test on Zisk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Zisk
+        run: curl -sL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup | bash -s -- --nokey
+
+      - name: Prepare input
+        working-directory: tools/Stateless/Tester
+        run: dotnet run -c release --project Tester.csproj -- ../ZiskGuest/bin
+
+      - name: Build Nethermind
+        working-directory: tools/Stateless
+        run: make build-zisk
+
+      - name: Test Nethermind
+        working-directory: tools/Stateless/ZiskGuest
+        run: |
+          ziskemu -e ./bin/nethermind -i ./bin/input.bin
+
+      - name: Upload guest binary
+        if: github.event.inputs.upload == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zisk-guest
+          path: tools/Stateless/ZiskGuest/bin/nethermind
+          if-no-files-found: error
