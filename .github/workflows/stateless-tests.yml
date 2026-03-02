@@ -38,7 +38,7 @@ jobs:
         run: make build-zisk
 
       - name: Test Nethermind
-        working-directory: tools/Stateless
+        working-directory: tools/Stateless/ZiskGuest
         run: |
           docker build -t zisk .
           docker run --rm -it zisk ziskemu -e /n/nethermind -i /n/input.bin
