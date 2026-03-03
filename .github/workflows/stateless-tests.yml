@@ -42,7 +42,7 @@ jobs:
         run: |
           docker build -t zisk .
           block_hash=$(docker run --rm zisk ziskemu -e /n/nethermind -i /n/input.bin)
-          [[ "${output%%$'\n'*}" == "0x1528a96c" ]] || exit 1
+          [[ "${block_hash%%$'\n'*}" == "0x1528a96c" ]] || exit 1
 
       - name: Upload guest binary
         if: github.event.inputs.upload == 'true'
