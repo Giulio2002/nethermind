@@ -41,13 +41,14 @@ jobs:
         working-directory: tools/Stateless/ZiskGuest
         run: |
           docker build -t zisk .
-          docker run --rm zisk ziskemu -e /n/nethermind -i /n/input.bin
+          block_hash=$(docker run --rm zisk ziskemu -e /n/nethermind -i /n/input.bin)
+          [[ "${output%%$'\n'*}" == "0x2528a96c" ]] || exit 1
 
       - name: Upload guest binary
         if: github.event.inputs.upload == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: zisk-guest
+          name: nethermind-zisk
           path: tools/Stateless/ZiskGuest/bin/nethermind
           if-no-files-found: error
 
@@ -75,12 +76,13 @@ jobs:
         working-directory: tools/Stateless/Tester
         run: |
           docker build --platform linux/amd64 -t zkevm .
-          docker run --rm zkevm
+          block_hash=$(docker run --rm zkevm)
+          [[ "${block_hash:0:10}" == "0x2528a96c" ]] || exit 1
 
       - name: Upload guest binary
         if: github.event.inputs.upload == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: zisk-guest
+          name: nethermind-zkevm
           path: tools/Stateless/Tester/bin/nethermind
           if-no-files-found: error
